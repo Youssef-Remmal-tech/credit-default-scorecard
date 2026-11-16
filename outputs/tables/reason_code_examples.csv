@@ -1,0 +1,3 @@
+case,score,reasons
+lowest score,443,status_latest (-53 pts); months_late_6m (-22 pts); log_credit_limit (-20 pts)
+just below 80% cut-off,510,status_latest (-25 pts); months_late_6m (-15 pts); months_no_payment (-8 pts)

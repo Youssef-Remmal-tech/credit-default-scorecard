@@ -1,0 +1,15 @@
+feature,iv,decision
+status_latest,0.8933789063766252,kept
+months_late_6m,0.8691096352659693,kept
+worst_status_3m,0.8264374932290502,dropped: WoE correlation > 0.75 with status_latest
+worst_status_6m,0.7911678943251426,dropped: WoE correlation > 0.75 with months_late_6m
+current_late_streak,0.7712827150625817,dropped: WoE correlation > 0.75 with status_latest
+months_no_payment,0.4295660621291567,kept
+log_credit_limit,0.19576310071791556,kept
+repayment_ratio_avg,0.15175950640573144,kept
+utilisation_avg_6m,0.0936595074357836,kept
+balance_trend,0.07751421972405725,kept
+utilisation_max_6m,0.05922780869637736,dropped: WoE correlation > 0.75 with utilisation_avg_6m
+utilisation_latest,0.05450842388988252,dropped: WoE correlation > 0.75 with utilisation_avg_6m
+months_paid_in_full_6m,0.047655901358522865,dropped: counter-intuitive coefficient sign in the regression
+months_inactive_6m,0.033797827260426204,dropped: counter-intuitive coefficient sign in the regression
