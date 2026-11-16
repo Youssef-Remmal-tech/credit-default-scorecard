@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cut-off Explorer · Credit Default Scorecard</title>
+<meta name="description" content="Interactive cut-off explorer for a credit card default scorecard: choose an approval rate and see the risk accepted.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{--paper:#F1F2EE;--card:#FAFAF7;--ink:#0F1C2B;--ink2:#3C4A5A;--muted:#66727F;--rule:#CDD2CB;--accent:#2447B8;--good:#23734F;--bad:#A3353A;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;--serif:"Source Serif 4",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--paper:#0C1622;--card:#101D2C;--ink:#E8ECEF;--ink2:#B7C1CB;--muted:#8894A1;--rule:#24344A;--accent:#8AA6FF;--good:#62C79A;--bad:#F08A8A}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55}
+.wrap{max-width:980px;margin:0 auto;padding:clamp(28px,6vw,64px) clamp(16px,4vw,32px)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,5vw,52px);line-height:1;margin:10px 0 14px;letter-spacing:-.02em;text-wrap:balance}
+.lede{color:var(--ink2);max-width:40em;margin:0}
+.panel{margin-top:32px;background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:clamp(18px,3vw,30px)}
+label{font-family:var(--mono);font-size:13px;color:var(--ink2);display:flex;justify-content:space-between;gap:12px}
+label b{color:var(--ink);font-weight:500}
+input[type=range]{width:100%;margin:14px 0 6px;accent-color:var(--accent);height:28px}
+.ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:26px}
+@media (max-width:720px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{border-top:3px solid var(--ink);padding-top:10px}
+.kpi .v{font-family:var(--display);font-weight:800;font-size:clamp(28px,4vw,40px);line-height:1.05;font-variant-numeric:tabular-nums}
+.kpi .l{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px}
+.kpi.bad{border-color:var(--bad)} .kpi.good{border-color:var(--good)}
+.chart{margin-top:28px;width:100%;height:auto;display:block}
+.note{font-size:15px;color:var(--ink2);margin-top:20px}
+a{color:var(--accent)}
+footer{margin-top:36px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Credit default scorecard · hold-out sample of 9,000 customers</div>
+  <h1>Where should the bank draw the line?</h1>
+  <p class="lede">Every cut-off trades growth for risk. Move the slider to choose what share of customers to approve. The scorecard approves the highest scores first, and the figures update from the hold-out results.</p>
+
+  <div class="panel">
+    <label for="rate"><span>Approval rate</span><b id="rateTxt">80%</b></label>
+    <input id="rate" type="range" min="30" max="100" step="1" value="80" aria-describedby="rateTxt">
+    <div class="ticks" aria-hidden="true"><span>30%</span><span>100%</span></div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="v" id="cut">511</div><div class="l">Cut-off score (points)</div></div>
+      <div class="kpi bad"><div class="v" id="br">14.2%</div><div class="l">Default rate among approved</div></div>
+      <div class="kpi good"><div class="v" id="dd">48.6%</div><div class="l">Of all defaulters declined</div></div>
+      <div class="kpi"><div class="v" id="gd">11.9%</div><div class="l">Of good customers declined</div></div>
+    </div>
+
+    <svg class="chart" id="chart" viewBox="0 0 760 306" role="img" aria-label="Default rate among approved customers by approval rate"></svg>
+    <p class="note" id="note"></p>
+  </div>
+
+  <footer>Data: Yeh &amp; Lien (2009), UCI Machine Learning Repository, CC BY 4.0. Model and code: <a href="https://github.com/Youssef-Remmal-tech/credit-default-scorecard">github.com/Youssef-Remmal-tech/credit-default-scorecard</a></footer>
+</div>
+<script src="cutoff_data.js"></script>
+<script>
+(function(){
+  var D = window.CUTOFF_DATA, base = window.BASE_RATE;
+  var svg = document.getElementById('chart'), NS = 'http://www.w3.org/2000/svg';
+  var W = 760, H = 300, m = {l:52, r:16, t:16, b:40};
+  var x = function(r){ return m.l + (r - 0.3) / 0.7 * (W - m.l - m.r); };
+  var yMax = Math.ceil(base * 100 + 1) / 100, yMin = 0.08;
+  var y = function(v){ return m.t + (yMax - v) / (yMax - yMin) * (H - m.t - m.b); };
+  function el(tag, attrs, text){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text) e.textContent = text; svg.appendChild(e); return e; }
+  var css = getComputedStyle(document.documentElement), c = function(n){ return css.getPropertyValue(n).trim(); };
+
+  for (var t = 0.10; t <= yMax + 1e-9; t += 0.04) {
+    el('line', {x1:m.l, x2:W-m.r, y1:y(t), y2:y(t), stroke:c('--rule'), 'stroke-width':1});
+    el('text', {x:m.l-8, y:y(t)+4, 'text-anchor':'end', 'font-size':11, 'font-family':'IBM Plex Mono, monospace', fill:c('--muted')}, Math.round(t*100)+'%');
+  }
+  [0.3,0.5,0.7,0.9,1.0].forEach(function(r){
+    el('text', {x:x(r), y:H-14, 'text-anchor':'middle', 'font-size':11, 'font-family':'IBM Plex Mono, monospace', fill:c('--muted')}, Math.round(r*100)+'%');
+  });
+  el('text', {x:(m.l+W-m.r)/2, y:H+4, 'text-anchor':'middle', 'font-size':11, 'font-family':'IBM Plex Mono, monospace', fill:c('--muted')}, 'approval rate');
+  el('line', {x1:m.l, x2:W-m.r, y1:y(base), y2:y(base), stroke:c('--muted'), 'stroke-dasharray':'4 4'});
+  el('text', {x:m.l+6, y:y(base)+16, 'font-size':11, 'font-family':'IBM Plex Mono, monospace', fill:c('--muted')}, 'approve everyone: ' + (base*100).toFixed(1) + '% default');
+  var d = D.map(function(p,i){ return (i?'L':'M') + x(p.approval_rate).toFixed(1) + ' ' + y(p.bad_rate_approved).toFixed(1); }).join(' ');
+  el('path', {d:d, fill:'none', stroke:c('--accent'), 'stroke-width':2.5, 'stroke-linejoin':'round'});
+  var guide = el('line', {y1:m.t, y2:H-m.b, stroke:c('--ink'), 'stroke-width':1, 'stroke-dasharray':'2 3'});
+  var dot = el('circle', {r:6, fill:c('--accent'), stroke:c('--card'), 'stroke-width':2.5});
+
+  var slider = document.getElementById('rate');
+  function pct(v){ return (v*100).toFixed(1) + '%'; }
+  function update(){
+    var r = +slider.value / 100;
+    var p = D.reduce(function(a,b){ return Math.abs(b.approval_rate - r) < Math.abs(a.approval_rate - r) ? b : a; });
+    document.getElementById('rateTxt').textContent = Math.round(r*100) + '%';
+    document.getElementById('cut').textContent = Math.round(p.cutoff_score);
+    document.getElementById('br').textContent = pct(p.bad_rate_approved);
+    document.getElementById('dd').textContent = pct(p.defaults_declined_share);
+    document.getElementById('gd').textContent = pct(p.goods_declined_share);
+    guide.setAttribute('x1', x(p.approval_rate)); guide.setAttribute('x2', x(p.approval_rate));
+    dot.setAttribute('cx', x(p.approval_rate)); dot.setAttribute('cy', y(p.bad_rate_approved));
+    var approved = Math.round(p.approval_rate * 9000);
+    document.getElementById('note').textContent = 'Out of 9,000 applicants, the bank approves ' + approved.toLocaleString('en-GB') +
+      ' customers scoring ' + Math.round(p.cutoff_score) + ' points or more. About ' +
+      Math.round(approved * p.bad_rate_approved).toLocaleString('en-GB') + ' of them default the following month, against ' +
+      Math.round(9000 * base).toLocaleString('en-GB') + ' if everyone were approved.';
+  }
+  slider.addEventListener('input', update);
+  update();
+})();
+</script>
+</body>
+</html>
