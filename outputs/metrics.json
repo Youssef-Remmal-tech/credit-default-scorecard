@@ -1,0 +1,131 @@
+{
+  "data": {
+    "customers": 30000,
+    "default_rate": 0.2212,
+    "train_n": 21000,
+    "test_n": 9000
+  },
+  "scorecard": {
+    "features": [
+      "status_latest",
+      "months_late_6m",
+      "months_no_payment",
+      "log_credit_limit",
+      "repayment_ratio_avg",
+      "utilisation_avg_6m",
+      "balance_trend"
+    ],
+    "n_features": 7,
+    "train": {
+      "auc": 0.766314952913344,
+      "gini": 0.5326299058266879,
+      "ks": 0.4165336573252436,
+      "brier": 0.1360729079457707
+    },
+    "test": {
+      "auc": 0.7450607918254488,
+      "gini": 0.49012158365089764,
+      "ks": 0.40075345474954027,
+      "brier": 0.14016494313143898
+    },
+    "score_min_test": 443.0,
+    "score_max_test": 566.0
+  },
+  "challenger": {
+    "train": {
+      "auc": 0.8059850287568051,
+      "gini": 0.6119700575136102,
+      "ks": 0.4562720505311543,
+      "brier": 0.12896486974284502
+    },
+    "test": {
+      "auc": 0.776054056637663,
+      "gini": 0.552108113275326,
+      "ks": 0.42536663953405973,
+      "brier": 0.1356067038928443
+    },
+    "best_params": {
+      "learning_rate": 0.05,
+      "max_depth": 3,
+      "max_iter": 200,
+      "min_samples_leaf": 50
+    },
+    "cv_auc": 0.7863198759756862
+  },
+  "bootstrap_gini_challenger_minus_scorecard": {
+    "gini_a_ci": [
+      0.4645842176157341,
+      0.5156266542400002
+    ],
+    "gini_b_ci": [
+      0.528183810585918,
+      0.5761491701174059
+    ],
+    "diff_mean": 0.062014777063676446,
+    "diff_ci": [
+      0.04681125012297037,
+      0.07767039254272882
+    ],
+    "n": 1000
+  },
+  "psi_score_train_vs_test": 0.0012460287835829734,
+  "risk_grades_holdout": [
+    {
+      "grade": "A",
+      "customers": 4269,
+      "defaults": 452,
+      "default_rate": 0.10587959709533849,
+      "min_score": 545.0,
+      "max_score": 566.0,
+      "share": 0.47433333333333333
+    },
+    {
+      "grade": "B",
+      "customers": 1936,
+      "defaults": 314,
+      "default_rate": 0.1621900826446281,
+      "min_score": 530.0,
+      "max_score": 544.0,
+      "share": 0.21511111111111111
+    },
+    {
+      "grade": "C",
+      "customers": 1112,
+      "defaults": 286,
+      "default_rate": 0.25719424460431656,
+      "min_score": 510.0,
+      "max_score": 529.0,
+      "share": 0.12355555555555556
+    },
+    {
+      "grade": "D",
+      "customers": 830,
+      "defaults": 346,
+      "default_rate": 0.41686746987951806,
+      "min_score": 480.0,
+      "max_score": 509.0,
+      "share": 0.09222222222222222
+    },
+    {
+      "grade": "E",
+      "customers": 853,
+      "defaults": 593,
+      "default_rate": 0.6951934349355217,
+      "min_score": 443.0,
+      "max_score": 479.0,
+      "share": 0.09477777777777778
+    }
+  ],
+  "cutoff_at_target_approval": {
+    "approval_rate": 0.8,
+    "cutoff_score": 511.0,
+    "bad_rate_approved": 0.14208333333333334,
+    "defaults_declined_share": 0.4861878453038674,
+    "goods_declined_share": 0.11870452275645599
+  },
+  "challenger_at_target_approval": {
+    "approval_rate": 0.8,
+    "bad_rate_approved": 0.13694444444444445,
+    "defaults_declined_share": 0.5047714716223004
+  }
+}
